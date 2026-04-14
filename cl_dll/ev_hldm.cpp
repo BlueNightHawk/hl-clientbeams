@@ -42,6 +42,8 @@
 #include "r_studioint.h"
 #include "com_model.h"
 
+#include "cl_beams.h"
+
 extern engine_studio_api_t IEngineStudio;
 
 static int tracerCount[MAX_PLAYERS];
@@ -912,7 +914,7 @@ void EV_FireGauss(event_args_t* args)
 			}
 			fFirstBeam = false;
 
-			gEngfuncs.pEfxAPI->R_BeamEntPoint(
+			gBeamAPI->R_BeamEntPoint(
 				idx | 0x1000,
 				tr.endpos,
 				m_iBeam,
@@ -929,7 +931,7 @@ void EV_FireGauss(event_args_t* args)
 		}
 		else
 		{
-			gEngfuncs.pEfxAPI->R_BeamPoints(vecSrc,
+			gBeamAPI->R_BeamPoints(vecSrc,
 				tr.endpos,
 				m_iBeam,
 				0.1,
@@ -1299,8 +1301,8 @@ void EV_FireRpg(event_args_t* args)
 int g_fireAnims1[] = {EGON_FIRE1, EGON_FIRE2, EGON_FIRE3, EGON_FIRE4};
 int g_fireAnims2[] = {EGON_ALTFIRECYCLE};
 
-BEAM* pBeam;
-BEAM* pBeam2;
+CLIENTBEAM* pBeam;
+CLIENTBEAM* pBeam2;
 
 void EV_EgonFire(event_args_t* args)
 {
@@ -1382,12 +1384,12 @@ void EV_EgonFire(event_args_t* args)
 			}
 
 
-			pBeam = gEngfuncs.pEfxAPI->R_BeamEntPoint(idx | 0x1000, tr.endpos, iBeamModelIndex, 99999, 3.5, 0.2, 0.7, 55, 0, 0, r, g, b);
+			pBeam = gBeamAPI->R_BeamEntPoint(idx | 0x1000, tr.endpos, iBeamModelIndex, 99999, 3.5, 0.2, 0.7, 55, 0, 0, r, g, b);
 
 			if (pBeam)
 				pBeam->flags |= (FBEAM_SINENOISE);
 
-			pBeam2 = gEngfuncs.pEfxAPI->R_BeamEntPoint(idx | 0x1000, tr.endpos, iBeamModelIndex, 99999, 5.0, 0.08, 0.7, 25, 0, 0, r, g, b);
+			pBeam2 = gBeamAPI->R_BeamEntPoint(idx | 0x1000, tr.endpos, iBeamModelIndex, 99999, 5.0, 0.08, 0.7, 25, 0, 0, r, g, b);
 		}
 	}
 }

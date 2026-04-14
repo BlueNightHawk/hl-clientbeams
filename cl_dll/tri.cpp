@@ -22,6 +22,8 @@
 #include "tri.h"
 extern IParticleMan* g_pParticleMan;
 
+#include "cl_beams.h"
+
 /*
 =================
 HUD_DrawNormalTriangles
@@ -32,6 +34,8 @@ Non-transparent triangles-- add them here
 void DLLEXPORT HUD_DrawNormalTriangles()
 {
 	//	RecClDrawNormalTriangles();
+
+	R_DrawBeams(false);
 
 	gHUD.m_Spectator.DrawOverview();
 }
@@ -48,6 +52,7 @@ void DLLEXPORT HUD_DrawTransparentTriangles()
 {
 	//	RecClDrawTransparentTriangles();
 
+	R_DrawBeams(true);
 
 	if (g_pParticleMan)
 		g_pParticleMan->Update();

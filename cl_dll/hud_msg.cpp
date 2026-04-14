@@ -24,8 +24,9 @@
 #include "particleman.h"
 extern IParticleMan* g_pParticleMan;
 
-extern BEAM* pBeam;
-extern BEAM* pBeam2;
+#include "cl_beams.h"
+extern CLIENTBEAM* pBeam;
+extern CLIENTBEAM* pBeam2;
 
 
 /// USER-DEFINED SERVER MESSAGE HANDLERS

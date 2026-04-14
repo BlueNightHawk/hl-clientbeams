@@ -48,6 +48,8 @@ typedef struct particle_s
 	// for pt_clientcusttom, we'll call this function each frame
 	void (*callback)(struct particle_s* particle, float frametime);
 
-	// For deathfunc, etc.
-	unsigned char context;
+	// HL added fields
+	void (*on_die)(struct particle_s* p);
+	void (*think)(struct particle_s* p, float frametime);
+	unsigned char userdata;
 } particle_t;

@@ -26,8 +26,12 @@
 #include "entity_types.h"
 #include "r_efx.h"
 
-extern BEAM* pBeam;
-extern BEAM* pBeam2;
+#include "cl_beams.h"
+
+extern CLIENTBEAM* pBeam;
+extern CLIENTBEAM* pBeam2;
+extern ref_params_t refdef;
+
 void HUD_GetLastOrg(float* org);
 
 void UpdateBeams()
@@ -36,10 +40,13 @@ void UpdateBeams()
 	Vector view_ofs;
 	pmtrace_t tr;
 	cl_entity_t* pthisplayer = gEngfuncs.GetLocalPlayer();
+	cl_entity_t* view = gEngfuncs.GetViewModel();
 	int idx = pthisplayer->index;
 
 	// Get our exact viewangles from engine
-	gEngfuncs.GetViewAngles((float*)angles);
+	//gEngfuncs.GetViewAngles((float*)angles);
+	angles = view->angles;
+	angles[0] = -angles[0];
 
 	// Determine our last predicted origin
 	HUD_GetLastOrg((float*)&origin);
@@ -63,14 +70,20 @@ void UpdateBeams()
 
 	gEngfuncs.pEventAPI->EV_PopPMStates();
 
+	Vector control = 0.5 * ((pthisplayer->attachment[0] + Vector(refdef.forward) * tr.endpos.Length2D()) + pthisplayer->attachment[0]);
+
 	if (pBeam)
 	{
+		pBeam->clflags = FBEAM_QUADRATIC;
+		pBeam->control = control;
 		pBeam->target = tr.endpos;
 		pBeam->die = gEngfuncs.GetClientTime() + 0.1; // We keep it alive just a little bit forward in the future, just in case.
 	}
 
 	if (pBeam2)
 	{
+		pBeam2->clflags = FBEAM_QUADRATIC;
+		pBeam2->control = control;
 		pBeam2->target = tr.endpos;
 		pBeam2->die = gEngfuncs.GetClientTime() + 0.1; // We keep it alive just a little bit forward in the future, just in case.
 	}

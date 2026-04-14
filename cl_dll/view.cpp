@@ -20,6 +20,8 @@
 #include "hltv.h"
 #include "Exports.h"
 
+ref_params_s refdef;
+
 int CL_IsThirdPerson();
 void CL_CameraOffset(float* ofs);
 
@@ -477,6 +479,47 @@ typedef struct
 	int CurrentAngle;
 } viewinterp_t;
 
+float lerp(float a, float b, float f)
+{
+	return a * (1.0 - f) + (b * f);
+}
+
+void V_CalcViewLag(struct ref_params_s* pparams)
+{
+	float frameadj = (1.0f / pparams->frametime) * 0.01;
+
+	cl_entity_s* view = gEngfuncs.GetViewModel();
+
+	static Vector prevAngles, lag;
+	Vector angle_delta;
+
+	angle_delta = (Vector(pparams->cl_viewangles) - prevAngles);
+
+	for (size_t i = 0; i < 3; i++)
+	{
+		if (angle_delta[i] < -300)
+		{
+			angle_delta[i] += 360;
+		}
+		else if (angle_delta[i] > 300)
+		{
+			angle_delta[i] -= 360;
+		}
+		lag[i] = lerp(lag[i], angle_delta[i] * frameadj, pparams->frametime * 4.0f);
+	}
+
+	gEngfuncs.Con_Printf("%f\n", angle_delta[1]);
+
+	view->angles[0] += (lag[0] * 10.0f);
+	view->angles[1] -= (lag[1] * 10.0f);
+
+	view->baseline.angles = lag;
+
+	NormalizeAngles(view->angles);
+
+	prevAngles = pparams->cl_viewangles;
+}
+
 /*
 ==================
 V_CalcRefdef
@@ -659,7 +702,6 @@ void V_CalcNormalRefdef(struct ref_params_s* pparams)
 		view->angles[YAW] -= bob * 0.5;
 		view->angles[ROLL] -= bob * 1;
 		view->angles[PITCH] -= bob * 0.3;
-		VectorCopy(view->angles, view->curstate.angles);
 	}
 
 	// pushing the view origin down off of the same X/Z plane as the ent's origin will give the
@@ -693,6 +735,9 @@ void V_CalcNormalRefdef(struct ref_params_s* pparams)
 	VectorAdd(pparams->viewangles, (float*)&ev_punchangle, pparams->viewangles);
 
 	V_DropPunchAngle(pparams->frametime, (float*)&ev_punchangle);
+	V_CalcViewLag(pparams);
+
+	VectorCopy(view->angles, view->curstate.angles);
 
 	// smooth out stair step ups
 #if 1
@@ -1643,6 +1688,8 @@ void DLLEXPORT V_CalcRefdef(struct ref_params_s* pparams)
 	{
 		V_CalcNormalRefdef(pparams);
 	}
+
+	refdef = *pparams;
 
 	/*
 // Example of how to overlay the whole screen with red at 50 % alpha

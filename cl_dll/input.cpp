@@ -21,6 +21,8 @@
 #include "vgui_TeamFortressViewport.h"
 #include "filesystem_utils.h"
 
+#include "cl_beams.h"
+
 
 extern bool g_iAlive;
 
@@ -1020,6 +1022,7 @@ void DLLEXPORT HUD_Shutdown()
 
 	ShutdownInput();
 
+	R_KillBeams();
 
 	FileSystem_FreeFileSystem();
 	CL_UnloadParticleMan();

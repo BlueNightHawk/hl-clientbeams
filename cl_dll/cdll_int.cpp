@@ -38,6 +38,8 @@
 #include "vgui_TeamFortressViewport.h"
 #include "filesystem_utils.h"
 
+#include "cl_beams.h"
+
 cl_enginefunc_t gEngfuncs;
 CHud gHUD;
 TeamFortressViewport* gViewPort = NULL;
@@ -172,6 +174,8 @@ int DLLEXPORT HUD_VidInit()
 	gHUD.VidInit();
 
 	VGui_Startup();
+
+	R_KillBeams();
 
 	return 1;
 }
